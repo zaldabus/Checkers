@@ -1,14 +1,15 @@
-require_relative 'piece'
+# -*- coding: utf-8 -*-
 require 'debugger'
+require_relative 'piece'
 
 class Board
 
   def initialize(fill_board = true)
-    @board = generate_board(fill_board)
+    generate_board(fill_board)
   end
 
-  def generate_board
-    Array.new(8) { Array.new(8) }
+  def generate_board(fill_board)
+    @board = Array.new(8) { Array.new(8) }
     populate_board if fill_board
   end
 
