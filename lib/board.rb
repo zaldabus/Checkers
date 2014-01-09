@@ -2,13 +2,14 @@ require_relative 'piece'
 require 'debugger'
 
 class Board
-  def self.generate_board
-    Array.new(8) { Array.new(8) }
+
+  def initialize(fill_board = true)
+    @board = generate_board(fill_board)
   end
 
-  def initialize(board = self.class.generate_board)
-    @board = board
-    populate_board
+  def generate_board
+    Array.new(8) { Array.new(8) }
+    populate_board if fill_board
   end
 
   def [](pos)
@@ -24,6 +25,7 @@ class Board
   def populate_board
     (0..7).each do |row|
       (0..7).each do |col|
+        #refactor this 30, 32, 34, 36 are all pretty similar
         case row
         when 0, 2
           self[[row, col]] = Piece.new(self, [row, col], :white) if col.odd?
@@ -39,44 +41,21 @@ class Board
   end
 
   def render
-    @board.each {|row| p row}
+    @board.each { |row| p row }
   end
 
-  def valid_pos?(pos)
-    pos.all? {|coord| coord.between?(0, 7) }
+  def dup
+    test_board = Board.new(false)
+
+    pieces.each do |piece|
+      piece.class.new(test_board, piece.pos, piece.color)
+    end
+
+    test_board
   end
 
-  def empty?(pos)
-    self[pos].nil?
+  def pieces
+    @board.flatten.compact
   end
 
-  def perform_jump(start_pos, end_pos)
-    raise "Invalid Jump!" unless self[start_pos].diagonal_attacks.include?(end_pos)
-    self[end_pos] = self[start_pos]
-    self[end_pos].pos = end_pos
-    self[start_pos] = nil
-    self[move_diffs(start_pos, end_pos)] = nil
-    self[end_pos].king_me if opposite_row?(end_pos)
-  end
-
-  def move_diffs(start_pos, end_pos)
-    start_x, start_y = start_pos
-    end_x, end_y = end_pos
-    [(start_x + end_x)/2, (start_y + end_y)/2]
-  end
-
-  def perform_slide(start_pos, end_pos)
-    # debugger
-    raise "Invalid Slide!" unless self[start_pos].diagonal_steps.include?(end_pos)
-    self[end_pos] = self[start_pos]
-    self[end_pos].pos = end_pos
-    self[start_pos] = nil
-    self[end_pos].king_me if opposite_row?(end_pos)
-  end
-
-  def opposite_row?(pos)
-    i, j = pos
-    opposite_row = (self[pos].color == :white ? 7 : 0)
-    i == opposite_row
-  end
 end
