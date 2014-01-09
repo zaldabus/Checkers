@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 class Piece
-  #remember to create a valid_pos?(pos) and empty(pos)
-  #method in Board class
+
+  attr_accessor :pos, :color, :board
 
   def initialize(board, pos, color)
     @board, @pos, @color = board, pos, color
@@ -27,9 +27,7 @@ class Piece
   end
 
   def king_me
-    i, j = pos
-    opposite_row = (self.color == :white ? 7 : 0)
-    @king = true if j == opposite_row
+    @king = true
   end
 
   def kinged?
@@ -41,7 +39,7 @@ class Piece
   end
 
   def forward_dir
-    (color == :red) ? -1 : 1
+    (self.color == :red) ? -1 : 1
   end
 
   def diagonal_steps
@@ -54,7 +52,7 @@ class Piece
     ]
 
     possible_steps.each do |step|
-      if board.valid_pos?(step) && board.empty?(step)
+      if self.board.valid_pos?(step) && self.board.empty?(step)
           steps << step
       end
     end
@@ -71,7 +69,7 @@ class Piece
     ]
 
     backward_possible_steps.each do |step|
-      if board.valid_pos?(step) && board.empty?(step)
+      if self.board.valid_pos?(step) && self.board.empty?(step)
           backward_steps << step
       end
     end
@@ -95,7 +93,7 @@ class Piece
     ]
 
     forward_attacks.each_index do |location|
-      next unless board.valid_pos?(forward_attacks[location])
+      next unless self.board.valid_pos?(forward_attacks[location])
 
       threatened_piece = board[blocked_spaces[location]]
       if threatened_piece && threatened_piece.color != self.color
@@ -122,7 +120,7 @@ class Piece
     ]
 
     backward_attacks.each_index do |location|
-      next unless board.valid_pos?(backward_attacks[location])
+      next unless self.board.valid_pos?(backward_attacks[location])
 
       threatened_piece = board[blocked_spaces[location]]
       if threatened_piece && threatened_piece.color != self.color
