@@ -146,12 +146,12 @@ class Piece
   end
 
   def perform_jump(end_pos)
-    return false unless board[pos].diagonal_attacks.include?(end_pos)
+    return false unless self.diagonal_attacks.include?(end_pos)
 
     board[move_diffs(pos, end_pos)] = nil
-    board[end_pos] = board[pos]
-    board[end_pos].pos = end_pos
     board[pos] = nil
+    board[end_pos] = self
+    board[end_pos].pos = end_pos
 
     self.king_me if opposite_row?(end_pos)
 
@@ -165,11 +165,12 @@ class Piece
   end
 
   def perform_slide(end_pos)
-    return false unless board[pos].diagonal_steps.include?(end_pos)
 
-    board[end_pos] = board[pos]
-    board[end_pos].pos = end_pos
+    return false unless self.diagonal_steps.include?(end_pos)
+
     board[pos] = nil
+    board[end_pos] = self
+    board[end_pos].pos = end_pos
 
     self.king_me if opposite_row?(end_pos)
 
