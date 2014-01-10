@@ -11,11 +11,21 @@ class Game
     @turn = :red
   end
 
+  def move(start_move, end_moves)
+    begin
+
+    rescue
+  end
+
   def play
     loop do
       @board.render
-      start_move, end_move = @players[@turn].move_input
-      @board[start_move].perform_moves(start_move, end_move)
+      begin
+        start_move, *end_moves = @players[@turn].move_input
+      raise InvalidMoveError if @board.empty?(start_move)
+        retry
+      end
+      @board[start_move].perform_moves(end_moves)
       break if winner?
       @turn = (@turn == :red ? :white : :red)
     end
@@ -29,4 +39,7 @@ class Game
   def no_pieces?(color_type)
     board.pieces.none? { |piece| piece.color == color_type }
   end
+end
+
+class InvalidMoveError < StandardError
 end
