@@ -5,8 +5,8 @@ class Piece
   attr_accessor :pos, :color, :board
 
   def initialize(board, pos, color, king = false)
-    @board, @pos, @color = board, pos, color
-    @king = king
+    @board, @pos, @color, @king = board, pos, color, king
+    board[pos] = self
   end
 
   def to_s
@@ -48,13 +48,14 @@ class Piece
   end
 
   def valid_move_seq?(move_sequence)
+    test_board = board.dup
     begin
-      test_board = board.dup
       test_board[pos].perform_moves!(move_sequence)
     rescue InvalidMoveError
       false
+    else
+      true
     end
-    true
   end
 
   def perform_moves(move_sequence)
@@ -93,7 +94,7 @@ class Piece
       end
     end
 
-    steps || nil
+    steps
   end
 
   def diagonal_attacks
@@ -133,7 +134,7 @@ class Piece
       end
     end
 
-    attacks || nil
+    attacks
   end
 
   def valid_pos?(pos)
@@ -147,12 +148,12 @@ class Piece
   def perform_jump(end_pos)
     return false unless self.diagonal_attacks.include?(end_pos)
 
-    board[pos] = nil
-    self.pos = end_pos
+    board[move_diffs(pos, end_pos)] = nil
     board[end_pos] = self
-    board[move_diffs(self, end_pos)] = nil
+    self.pos = end_pos
+    board[pos] = nil
 
-    piece.king_me if opposite_row?(end_pos)
+    self.king_me if opposite_row?(end_pos)
 
     true
   end
@@ -166,9 +167,9 @@ class Piece
   def perform_slide(end_pos)
     return false unless self.diagonal_steps.include?(end_pos)
 
-    board[pos] = nil
-    self.pos = end_pos
     board[end_pos] = self
+    self.pos = end_pos
+    board[pos] = nil
 
     self.king_me if opposite_row?(end_pos)
 
@@ -177,7 +178,7 @@ class Piece
 
   def opposite_row?(pos)
     i, j = pos
-    opposite_row = (board[pos].color == :white ? 7 : 0)
+    opposite_row = (self.color == :white ? 7 : 0)
     i == opposite_row
   end
 

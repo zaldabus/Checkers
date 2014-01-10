@@ -14,9 +14,8 @@ class Game
 
   def play
     loop do
-      debugger
       @board.render
-      start_move, *end_moves = @players[@turn].move_input
+      start_move, end_moves = @players[@turn].move_input
 
       # raise InvalidMoveError if @board.empty?(start_move)
 
