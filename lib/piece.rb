@@ -146,11 +146,11 @@ class Piece
   end
 
   def perform_jump(end_pos)
-    return false unless self.diagonal_attacks.include?(end_pos)
+    return false unless board[pos].diagonal_attacks.include?(end_pos)
 
     board[move_diffs(pos, end_pos)] = nil
-    board[end_pos] = self
-    self.pos = end_pos
+    board[end_pos] = board[pos]
+    board[end_pos].pos = end_pos
     board[pos] = nil
 
     self.king_me if opposite_row?(end_pos)
@@ -165,10 +165,10 @@ class Piece
   end
 
   def perform_slide(end_pos)
-    return false unless self.diagonal_steps.include?(end_pos)
+    return false unless board[pos].diagonal_steps.include?(end_pos)
 
-    board[end_pos] = self
-    self.pos = end_pos
+    board[end_pos] = board[pos]
+    board[end_pos].pos = end_pos
     board[pos] = nil
 
     self.king_me if opposite_row?(end_pos)
@@ -183,7 +183,7 @@ class Piece
   end
 
   def dup(test_board)
-    Piece.new(test_board, pos, color, kinged?)
+    Piece.new(test_board, pos.dup, color, kinged?)
   end
 
 end
