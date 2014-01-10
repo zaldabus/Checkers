@@ -4,9 +4,9 @@ class Piece
 
   attr_accessor :pos, :color, :board
 
-  def initialize(board, pos, color)
+  def initialize(board, pos, color, king = false)
     @board, @pos, @color = board, pos, color
-    @king = false
+    @king = king
   end
 
   def to_s
@@ -34,35 +34,15 @@ class Piece
     @king
   end
 
-  def perform_moves!(*move_sequence)
-    debugger
-    reference_moves = []
-
-    until move_sequence.empty?
-      if move_sequence.length == 2 && reference_moves.empty?
-        start_pos, end_pos = move_sequence.first, move_sequence.last
-        move_sequence = []
-        begin
-          perform_slide(start_pos, end_pos)
-        rescue
-          perform_jump(start_pos, end_pos)
-        end
-
-      elsif move_sequence.length > 1
-        if reference_moves.empty?
-          reference_moves = move_sequence.shift(2)
-          start_pos, end_pos = reference_moves.first, reference_moves.last
-          raise InvalidMoveError unless perform_jump(start_pos, end_pos)
-          reference_moves << end_pos
-        else
-          start_pos, end_pos = reference_moves.shift, move_sequence.shift
-          raise InvalidMoveError unless perform_jump(start_pos, end_pos)
-          reference_moves << end_pos
-        end
-
-      elsif move_sequence.length == 1
-        start_pos, end_pos = reference_moves.shift, move_sequence.shift
-        raise InvalidMoveError unless perform_jump(start_pos, end_pos)
+  def perform_moves!(move_sequence)
+    if move_sequence.length == 1
+      pos = move_sequence.first
+      unless perform_slide(pos) || perform_jump(pos)
+        raise InvalidMoveError
+      end
+    else
+      move_sequence.each do |move|
+        raise InvalidMoveError unless perform_jump(move)
       end
     end
   end
@@ -164,16 +144,17 @@ class Piece
     board[pos].nil?
   end
 
-  def perform_jump(start_pos, end_pos)
-    piece = board[start_pos]
-    raise InvalidMoveError unless piece && piece.diagonal_attacks.include?(end_pos)
-    board[end_pos] = piece
-    piece.pos = end_pos
+  def perform_jump(end_pos)
+    return false unless self.diagonal_attacks.include?(end_pos)
 
-    board[start_pos] = nil
-    board[move_diffs(start_pos, end_pos)] = nil
+    board[pos] = nil
+    self.pos = end_pos
+    board[end_pos] = self
+    board[move_diffs(self, end_pos)] = nil
 
     piece.king_me if opposite_row?(end_pos)
+
+    true
   end
 
   def move_diffs(start_pos, end_pos)
@@ -182,21 +163,26 @@ class Piece
     [(start_x + end_x)/2, (start_y + end_y)/2]
   end
 
-  def perform_slide(start_pos, end_pos)
-    piece = board[start_pos]
-    raise InvalidMoveError unless piece && piece.diagonal_steps.include?(end_pos)
-    board[end_pos] = piece
-    piece.pos = end_pos
+  def perform_slide(end_pos)
+    return false unless self.diagonal_steps.include?(end_pos)
 
-    board[start_pos] = nil
+    board[pos] = nil
+    self.pos = end_pos
+    board[end_pos] = self
 
-    piece.king_me if opposite_row?(end_pos)
+    self.king_me if opposite_row?(end_pos)
+
+    true
   end
 
   def opposite_row?(pos)
     i, j = pos
     opposite_row = (board[pos].color == :white ? 7 : 0)
     i == opposite_row
+  end
+
+  def dup(test_board)
+    Piece.new(test_board, pos, color, kinged?)
   end
 
 end

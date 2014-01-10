@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 require_relative 'board'
 require_relative 'humanplayer'
+require 'debugger'
 
 class Game
   attr_reader :board
@@ -11,20 +12,14 @@ class Game
     @turn = :red
   end
 
-  def move(start_move, end_moves)
-    begin
-
-    rescue
-  end
-
   def play
     loop do
+      debugger
       @board.render
-      begin
-        start_move, *end_moves = @players[@turn].move_input
-      raise InvalidMoveError if @board.empty?(start_move)
-        retry
-      end
+      start_move, *end_moves = @players[@turn].move_input
+
+      # raise InvalidMoveError if @board.empty?(start_move)
+
       @board[start_move].perform_moves(end_moves)
       break if winner?
       @turn = (@turn == :red ? :white : :red)

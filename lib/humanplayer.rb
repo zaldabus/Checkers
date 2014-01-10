@@ -28,6 +28,10 @@ class HumanPlayer
       moves << [(8 - move[1].to_i), horizontal_directional.index(move[0].upcase)]
     end
 
-    moves
+    if moves.length == 1
+      moves.flatten
+    else
+      moves
+    end
   end
 end

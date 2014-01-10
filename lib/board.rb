@@ -37,8 +37,11 @@ class Board
   def dup
     test_board = Board.new(false)
 
-    pieces.each do |piece|
-      piece.class.new(test_board, piece.pos, piece.color)
+    @board.each do |row|
+      row.each do |space|
+        next if space.nil?
+        space.dup(test_board)
+      end
     end
 
     test_board
@@ -46,6 +49,10 @@ class Board
 
   def pieces
     @board.flatten.compact
+  end
+
+  def empty?(pos)
+    self[pos].nil?
   end
 
 end
