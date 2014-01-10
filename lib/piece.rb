@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+require 'debugger'
 class Piece
 
   attr_accessor :pos, :color, :board
@@ -35,15 +35,16 @@ class Piece
   end
 
   def perform_moves!(*move_sequence)
+    debugger
     reference_moves = []
 
     until move_sequence.empty?
       if move_sequence.length == 2 && reference_moves.empty?
-        moves = move_sequence.shift(2)
-        start_pos, end_pos = moves.first, moves.last
+        start_pos, end_pos = move_sequence.first, move_sequence.last
+        move_sequence = []
         begin
           perform_slide(start_pos, end_pos)
-        rescue InvalidMoveError
+        rescue
           perform_jump(start_pos, end_pos)
         end
 
@@ -66,20 +67,19 @@ class Piece
     end
   end
 
-  def valid_move_seq?(*move_sequence)
+  def valid_move_seq?(move_sequence)
     begin
       test_board = board.dup
-      perform_moves!(*move_sequence)
+      test_board[pos].perform_moves!(move_sequence)
     rescue InvalidMoveError
-      puts "Invalid Move Sequence!"
-      return false
+      false
     end
     true
   end
 
-  def perform_moves(*move_sequence)
-    if valid_move_seq?(*move_sequence)
-      perform_moves!(*move_sequence)
+  def perform_moves(move_sequence)
+    if valid_move_seq?(move_sequence)
+      perform_moves!(move_sequence)
     else
       raise InvalidMoveError
     end

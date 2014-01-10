@@ -5,12 +5,8 @@ require_relative 'piece'
 class Board
 
   def initialize(fill_board = true)
-    generate_board(fill_board)
-  end
-
-  def generate_board(fill_board)
     @board = Array.new(8) { Array.new(8) }
-    populate_board if fill_board
+    fill_spaces if fill_board
   end
 
   def [](pos)
@@ -23,21 +19,14 @@ class Board
     @board[x][y] = piece
   end
 
-  def populate_board
-    (0..7).each do |row|
-      (0..7).each do |col|
-        #refactor this 30, 32, 34, 36 are all pretty similar
-        case row
-        when 0, 2
-          self[[row, col]] = Piece.new(self, [row, col], :white) if col.odd?
-        when 1
-          self[[row, col]] = Piece.new(self, [row, col], :white) if col.even?
-        when 5, 7
-          self[[row, col]] = Piece.new(self, [row, col], :red) if col.even?
-        when 6
-          self[[row, col]] = Piece.new(self, [row, col], :red) if col.odd?
-        end
-      end
+  def fill_spaces
+     (0...3).each { |row| fill_row(row, :white) }
+     (5...8).each { |row| fill_row(row, :red) }
+  end
+
+  def fill_row(row, color)
+    8.times do |col|
+      self[[row, col]] = Piece.new(self, [row, col], color) if ((row % 2) == (col % 2))
     end
   end
 

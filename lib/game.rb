@@ -13,9 +13,9 @@ class Game
 
   def play
     loop do
-      @board.render + "\n"
-      moves = @players[@turn].move_input
-      @board[start_move].perform_moves(moves)
+      @board.render
+      start_move, end_move = @players[@turn].move_input
+      @board[start_move].perform_moves(start_move, end_move)
       break if winner?
       @turn = (@turn == :red ? :white : :red)
     end

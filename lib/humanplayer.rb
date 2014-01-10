@@ -16,7 +16,7 @@ class HumanPlayer
   def format_move(user_input)
     horizontal_directional = ("A".."H").to_a
 
-    start_move, end_move = players_input.split(", ")
+    start_move, end_move = user_input.split(", ")
 
     start_move = [(8 - start_move[1].to_i), horizontal_directional.index(start_move[0].upcase)]
     end_move = [(8 - end_move[1].to_i), horizontal_directional.index(end_move[0].upcase)]
