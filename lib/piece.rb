@@ -17,6 +17,9 @@ class Piece
     symbols[[color, kinged?]]
   end
 
+  ## REVIEW: using an array as a hash key, which works, but I'm not sure
+  ## how clear or stylistically good that is. But if you do it this  I think
+  ## you'll have to change the keys here to [:white, true], [:white, false], etc
   def symbols
     {
     [:white, kinged?] => "⚆",
@@ -30,23 +33,38 @@ class Piece
     @king = true
   end
 
+  ## REVIEW: This seems unnecessary, the @king variable is already a boolean so
+  ## whereever you call kinged? you could have just called @king
   def kinged?
     @king
   end
 
   def perform_moves!(*move_sequence)
+
+=begin
+  REVIEW:
+    When you perform_slide or perform_jump in this method, the piece actually
+    moves there (ie, it's position changes to end_pos, and the board updates
+    to reflect this). Therefore instead of adding each end_pos to a
+    reference_moves array, you could each through the entire move sequence, and
+    your perform_slide or perform_jump methods will either execute without error
+    if the whole move_sequence is correct, or raise an error at the first
+    invalid move. Also I think this is why they originaly advise us to return true
+    or false in the perform_slide and perform_jump methods, because it helps with the
+    logic if you implement perform_moves! as described above
+=end
     reference_moves = []
 
     until move_sequence.empty?
       if move_sequence.length == 2 && reference_moves.empty?
         moves = move_sequence.shift(2)
+        ## REVIEW: Could just use: start_pos, end_pos = moves
         start_pos, end_pos = moves.first, moves.last
         begin
           perform_slide(start_pos, end_pos)
         rescue InvalidMoveError
           perform_jump(start_pos, end_pos)
         end
-
       elsif move_sequence.length > 1
         if reference_moves.empty?
           reference_moves = move_sequence.shift(2)
@@ -164,6 +182,8 @@ class Piece
     board[pos].nil?
   end
 
+  ## REVIEW: I think you want this to return true or false rather than raise an
+  ## error
   def perform_jump(start_pos, end_pos)
     piece = board[start_pos]
     raise InvalidMoveError unless piece && piece.diagonal_attacks.include?(end_pos)
@@ -182,6 +202,9 @@ class Piece
     [(start_x + end_x)/2, (start_y + end_y)/2]
   end
 
+  ## REVIEW: I think you want this to return true or false rather than raise error
+  ## Right now it's returning the last line evaluated, which is either
+  ## the piece.king_me? or an error
   def perform_slide(start_pos, end_pos)
     piece = board[start_pos]
     raise InvalidMoveError unless piece && piece.diagonal_steps.include?(end_pos)

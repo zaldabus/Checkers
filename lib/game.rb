@@ -13,6 +13,12 @@ class Game
 
   def play
     loop do
+      ## REVIEW: I think this @board.render + "\n" was throwing me an error
+      ## becaause @board.render returns and array and you can't and a string to
+      ## an array. Instead you could just do:
+      # @board.render
+      # puts
+
       @board.render + "\n"
       moves = @players[@turn].move_input
       @board[start_move].perform_moves(moves)

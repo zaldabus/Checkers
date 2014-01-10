@@ -26,6 +26,12 @@ class Board
   def populate_board
     (0..7).each do |row|
       (0..7).each do |col|
+
+        ## REVIEW: One trick I figure out for this: if col+row is odd, you
+        ## add checker piece. Then instead of eaching through 0..7, you can
+        ## use [0,1,2,5,6,7].each |row| since these are the only rows with
+        ## pieces.
+
         #refactor this 30, 32, 34, 36 are all pretty similar
         case row
         when 0, 2
